@@ -1,4 +1,4 @@
-﻿@model LightLib.Web.Models.Patron.PatronIndexModel
+@model LightLib.Web.Models.Patron.PatronIndexModel
 @{
     ViewBag.Title = "Patrons";
 }
@@ -20,11 +20,50 @@
 
 <div class="row">
     <div class="col-12">
-        <button class="btn btn-primary btn-sm">
+        <button onclick="goToCreate()" class="btn btn-primary btn-sm">
             Add New Patron
         </button>
     </div>
 </div>
+
+
+<form onsubmit="createPatron(event)">
+     <br /> <br />
+      <label for="firstName">First Name</label>
+      <input id="firstName" type="text" />
+      <br /> <br />
+
+      <label for="lastName">Last Name</label>
+      <input id="lastName" type="text" />
+      <br /> <br />
+
+        <label for="address">Address</label>
+      <input id="address" type="text" />
+      <br /> <br />
+
+        <label for="dob">Date Of Birth</label>
+      <input id="dob" type="date" />
+      <br /> <br />
+
+        <label for="email">Email</label>
+      <input id="email" type="email" />
+      <br />  <br />
+
+        <label for="telephone">Telephone</label>
+      <input id="telephone" type="text" />
+      <br /> <br />
+
+        <label for="libraryCardId">Library Card ID</label>
+      <input id="libraryCardId" type="number" />
+      <br /> <br />
+
+      <label for="homeLibraryBranchId">Home Library Branch Id</label>
+      <input id="homeLibraryBranchId" type="number" />
+      <br />
+      <br />
+
+       <input type="submit" value="Add Patron" />
+</form>
 
 <hr />
 
@@ -38,6 +77,8 @@
                 <th scope="col" style="width: 20%">First</th>
                 <th scope="col" style="width: 25%">Email</th>
                 <th scope="col" style="width: 5%">Fees</th>
+                <th scope="col" style="width: 5%">Delete</th>
+                <th scope="col" style="width: 5%">Update</th>
             </tr>
             </thead>
             <tbody>
@@ -49,10 +90,21 @@
                                 View Details
                             </a>
                         </th>
-                        <td>@patron.LastName</td>
-                        <td>@patron.FirstName</td>
-                        <td>@patron.Email</td>
+                        <td id=uLastName-@patron.Id contenteditable="true">@patron.LastName</td>
+
+                        <td id=uFirstName-@patron.Id  + @patron.Id contenteditable="true">@patron.FirstName</td>
+
+                        <td id=uEmail-@patron.Id + @patron.Id contenteditable="true">@patron.Email</td>
+
                         <td>$@Math.Round(patron.OverdueFees, 2)</td>
+
+                        <td scope="col" onclick="deletePatron(@patron.Id)" style="width: 5%">
+                            <button class="btn btn-danger">Delete</button>
+                        </td>
+
+                         <td onclick="updatePatron(@patron.Id)" scope="col" style="width: 5%">
+                            <button class="btn btn-success">Update</button>
+                        </td>
                     </tr>
                 </a>
             }
@@ -78,4 +130,119 @@
     </div>
 </div>
 
+<script>
+
+      
+function checkEmail(emailAddress) {
+    var sQtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
+    var sDtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
+    var sAtom = '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+';
+    var sQuotedPair = '\\x5c[\\x00-\\x7f]';
+    var sDomainLiteral = '\\x5b(' + sDtext + '|' + sQuotedPair + ')*\\x5d';
+    var sQuotedString = '\\x22(' + sQtext + '|' + sQuotedPair + ')*\\x22';
+    var sDomain_ref = sAtom;
+    var sSubDomain = '(' + sDomain_ref + '|' + sDomainLiteral + ')';
+    var sWord = '(' + sAtom + '|' + sQuotedString + ')';
+    var sDomain = sSubDomain + '(\\x2e' + sSubDomain + ')*';
+    var sLocalPart = sWord + '(\\x2e' + sWord + ')*';
+    var sAddrSpec = sLocalPart + '\\x40' + sDomain; // complete RFC822 email address spec
+    var sValidEmail = '^' + sAddrSpec + '$'; // as whole string
+
+    var reValidEmail = new RegExp(sValidEmail);
+
+    return reValidEmail.test(emailAddress);
+}
+
+
+async function createPatron(event) {
+    event.preventDefault()
+
+    var firstName = document.getElementById("firstName").value
+    var lastName = document.getElementById("lastName").value
+    var address = document.getElementById("address").value
+    var dob = document.getElementById("dob").value
+    var email = document.getElementById("email").value
+    var telephone = document.getElementById("telephone").value
+    var libraryCardId = document.getElementById("libraryCardId").value
+    var homeLibraryBranchId = document.getElementById("homeLibraryBranchId").value
+
+    var isValid = true
+    if (firstName == "" || firstName == null) {
+        isValid = false
+        alert("Please Enter Valid First Name")
+    } else if (lastName == "" || lastName == null) {
+        isValid = false
+        alert("Please Enter Valid Last Name")
+    } else if (address == "" || address == null) {
+        isValid = false
+        alert("Please Enter Valid Address")
+    } else if (email == "" || email == null || !checkEmail(email)) {
+        isValid = false
+        alert("Please Enter Valid Email")
+    } else if (telephone == "" || telephone == null) {
+        isValid = false
+        alert("Please Enter Valid Phone")
+    } else if (libraryCardId == null) {
+        isValid = false
+        alert("Please Enter Library Card Id Number")
+    } else if (homeLibraryBranchId == null) {
+        isValid = false
+        alert("Please Enter Home Library Branch Id Number")
+    }
+
+    var patron = {
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        dob: dob,
+        email: email,
+        telephone: telephone,
+        libraryCardId: libraryCardId,
+        homeLibraryBranchId: homeLibraryBranchId,
+    }
+
+    if (isValid) {
+        await fetch("http://localhost:3000/add", {
+            method: "POST",
+            body: JSON.stringify(patron),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then((res) => window.location.reload())
+            .catch((err) => {
+                throw new Error(`Request failed with status ${err}`)
+            })
+    }
+}
+
+
+function deletePatron(id) {
+    fetch("http://localhost:3000/" + id)
+        .then(response => document.location.reload())
+}
+
+async function updatePatron(id) {
+    const firstName = document.getElementById(`uFirstName-${id}`).innerText.trim()
+    const lastName = document.getElementById(`uLastName-${id}`).innerText.trim()
+    const email = document.getElementById(`uEmail-${id}`).innerText.trim()
+
+    const data = {firstName, lastName, email}
+
+    console.log(data)
+
+    await fetch("http://localhost:3000/update/" + id, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then((res) => window.location.reload())
+        .catch((err) => {
+            throw new Error(`Request failed with status ${err}`)
+        })
+    
+}
+</script>
 
