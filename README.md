@@ -1,4 +1,4 @@
-This project was originally extracted from Wes Doyle. You can find more info about it here: https://www.youtube.com/watch?v=WTVcLFTgDqs
+This project was originally extracted from a project by Wes Doyle. You can find more info about it here: https://www.youtube.com/watch?v=WTVcLFTgDqs
 Some minor changes have been made to the original code to add some functionalities like CRUD. Also, with the purpose of understanding the concept of software testing, some software testing practices like Static Code Analysis, Security Testing, etc were conducted on the original code using tools like Sonarqube and Selenium . 
 
 
