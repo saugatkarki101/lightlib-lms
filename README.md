@@ -1,3 +1,7 @@
+This project was originally extracted from Wes Doyle. You can find more info about it here: https://www.youtube.com/watch?v=WTVcLFTgDqs
+Some minor changes have been made to the original code to add some functionalities like CRUD. Also, with the purpose of understanding the concept of software testing, some software testing practices like Static Code Analysis, Security Testing, etc were conducted on the original code using tools like Sonarqube and Selenium . 
+
+
 # LightLib Library Management System (LMS)
 
 A lightweight library management system built in .NET 5.0 with Entity Framework Core.  Enables library administrators to manage Library Assets, Patrons, and Branches with basic functionality.
